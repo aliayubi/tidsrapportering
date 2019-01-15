@@ -1,5 +1,5 @@
 # tidsrapportering
-En enkel tidsrapporteringsfunktion för chaufförer
+En enkel tidsrapporteringsfunktion för chaufförer.
 
 1- Installera och aktivera tillägg.   
 2- Du kan lägga till ny tidsrapport genom formulären i "Ny tidsrapport" sidan - du kan hitta länken till sidan i WP-ADMIN meny.  
