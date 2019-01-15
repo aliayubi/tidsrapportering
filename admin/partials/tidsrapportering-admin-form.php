@@ -28,9 +28,9 @@
                 <td><label><?php echo __( 'Uppdrag', 'tidsrapportering' ); ?></label></td>
                 <td>
                 <select name="task">
-                <option value="day" selected><?php echo __( 'Dag', 'tidsrapportering' ); ?></option>
-                <option value="noon"><?php echo __( 'Kväll', 'tidsrapportering' ); ?></option>
-                <option value="night"><?php echo __( 'Natt', 'tidsrapportering' ); ?></option>
+                <option value="Dag" selected><?php echo __( 'Dag', 'tidsrapportering' ); ?></option>
+                <option value="Kväll"><?php echo __( 'Kväll', 'tidsrapportering' ); ?></option>
+                <option value="Natt"><?php echo __( 'Natt', 'tidsrapportering' ); ?></option>
                 </select>
                 </td>
             </tr>
@@ -48,6 +48,46 @@
      <input type="submit" class="button button-primary" value="<?php echo __( 'Lägg till tiden', 'tidsrapportering' ); ?>">
     </p>
 </form>
-<form class="get_reports" method="GET">
-     <input type="submit" class="button button-primary" value="<?php echo __( 'Få sammantfatnning', 'tidsrapportering' ); ?>">
+<?php
+$args_reports = array(
+	'post_type' => array('tidsrapportering'),
+	'post_status' => array('publish'),
+	'posts_per_page' => -1,
+	'order' => 'DESC',
+);
+$reports = new WP_Query( $args_reports );
+$persons = array();
+if ( $reports->have_posts() ) {
+	while ( $reports->have_posts() ) {
+        $reports->the_post();
+        
+        $persons[] = get_post_meta(get_the_ID(), 'person', true);
+	}
+} else {
+}
+wp_reset_postdata();
+$un_persons = array_unique($persons);
+?>
+<form class="get_reports" action="/wp-admin/admin-ajax.php?action=get_reports" method="POST">  
+<h2>Sammanfattning</h2>
+    <table class="form-table report_table">
+        <tbody>
+            <tr>
+                <td><label style="padding-right: 25px;"><?php echo __( 'Välja personen som du vill få sammanfattning för:', 'tidsrapportering' ); ?></label>
+                    <select name="person" class="person_select">
+                    <?php
+                        foreach ($un_persons as $person) {
+                    ?>
+                    <option value="<?php echo $person; ?>"><?php echo $person; ?></option>      
+                    <?php      
+                        }
+                    ?>
+                    </select>
+                </td>
+                <td>
+                <input type="submit" class="button button-primary" value="<?php echo __( 'Ladda ner sammanfattning i PDF format', 'tidsrapportering' ); ?>">
+                </td>
+            </tr>
+        </tbody>
+    </table>
 </form>

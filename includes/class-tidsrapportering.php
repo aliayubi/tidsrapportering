@@ -17,6 +17,7 @@ class Tidsrapportering {
 	}
 
 	private function load_dependencies() {
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/topdf/tcpdf_include.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/tidsrapportering-admin-display.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-tidsrapportering-loader.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-tidsrapportering-admin.php';

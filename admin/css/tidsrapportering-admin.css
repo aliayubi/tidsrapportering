@@ -4,3 +4,12 @@
 .ui-timepicker-wrapper {
     width: 12% !important;
 }
+select.person_select {
+    width: 36%;
+}
+.ny-tidsrapport_page_Sammanfattning form.add_report {
+    display: none;
+}
+.toplevel_page_tidsrapportering form.get_reports {
+    display: none;
+}

@@ -24,14 +24,14 @@ $('.add_report').submit(function (e) {
     }); 
 });
 
-$('.get_reports').submit(function (e) { 
-    e.preventDefault();
-    $.ajax({
-        type: "get",
-        url: "/wp-admin/admin-ajax.php?action=get_reports",
-        success: function (response) {
-            console.log(response);
-        }
-    }); 
-});
+// $('.get_reports').submit(function (e) { 
+//     e.preventDefault();
+//     $.ajax({
+//         type: "get",
+//         url: "/wp-admin/admin-ajax.php?action=get_reports",
+//         success: function (response) {
+//             console.log(response);
+//         }
+//     }); 
+// });
 });

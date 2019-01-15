@@ -31,7 +31,7 @@ class Tidsrapportering_Admin {
 			'taxonomies' => array(),
 			'public' => true,
 			'show_ui' => true,
-			'show_in_menu' => true,
+			'show_in_menu' => false,
 			'menu_position' => 5,
 			'show_in_admin_bar' => true,
 			'show_in_nav_menus' => true,
@@ -56,6 +56,7 @@ class Tidsrapportering_Admin {
 		$position = 24;
 	
 		add_menu_page( $page_title, $menu_title, $capability, $menu_slug, $function, $icon_url, $position );
+		add_submenu_page( $menu_slug , 'Sammanfattning', 'Sammanfattning', $capability, 'Sammanfattning' , $function, $icon_url, $position );
 	}
 
 	public function submit_report() {
@@ -76,19 +77,89 @@ class Tidsrapportering_Admin {
 		
 	}
 	public function get_reports() {
-		$data = $_GET;
+	$person = $_POST["person"];
 		$args = array(
 			'post_type' => array('tidsrapportering'),
 			'post_status' => array('publish'),
-			'post_author'   => get_current_user_id(),
 			'posts_per_page' => -1,
 			'order' => 'DESC',
+			'meta_key' => 'person',
+			'meta_value' => $person,
+			'meta_compare' => '=',
 		);
 		$reports = new WP_Query( $args );
+		$datas = array();
 		while($reports->have_posts()){
 			$reports->the_post();
+			$person = get_post_meta(get_the_ID(), 'person', true);
+			$date = get_post_meta(get_the_ID(), 'date', true);
 			$time_start = get_post_meta(get_the_ID(), 'time_start', true);
+			$time_end = get_post_meta(get_the_ID(), 'time_end', true);
+			$date_end = get_post_meta(get_the_ID(), 'date_end', true);
+			$total_hours = get_post_meta(get_the_ID(), 'total_hours', true);
+			$task = get_post_meta(get_the_ID(), 'task', true);
+			$work_area = get_post_meta(get_the_ID(), 'work_area', true);
+			$extra_info = get_post_meta(get_the_ID(), 'extra_info', true);
+			$datas[] = array(
+				"person" => $person,
+				"date" => $date,
+				"time_start" => $time_start,
+				"time_end" => $time_end,
+				"total_hours" => $total_hours,
+				"task" => $task,
+				"work_area" => $work_area,
+				"extra_info" => $extra_info
+			);
 		  }
-		wp_send_json($time_start);
+		  $pdf = new TCPDF('P', 'pt', 'A4', true, 'UTF-8', false);
+		  $pdf->SetMargins(10, 60, 10, true);
+		  $pdf->SetAutoPageBreak(TRUE, 10);
+		  $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+		  $pdf->setLanguageArray($l);
+		  $pdf->SetDisplayMode('fullpage', 'SinglePage', 'UseNone');
+		  $pdf->SetTextColor(3, 3, 4);
+		  $pdf->SetDrawColor(3, 3, 4, false, '');
+		  $pdf->AddPage('P', 'A4');
+		  ob_get_clean();
+		  ob_start();
+		  ?>
+			<h1>Sammanfattning</h1>
+			<table cellpadding="5">
+				<thead>
+		  			<tr style="font-size:13px; font-weight:bold;">
+		  				<td>Arbetare</td>
+						<td>Datum</td>
+						<td>Tid från:</td>
+						<td>Tid till:</td>
+						<td>Antal timmer</td>
+						<td>Uppdrag</td>
+						<td>Arbetsplats</td>
+						<td>Mer info</td>
+					</tr>
+				</thead>
+				<tbody>
+				<?php 
+				foreach ($datas as $data) {
+				?>
+					<tr style="font-size:13px; height:150px">
+						<td><?php echo $data["person"]; ?></td>
+						<td><?php echo $data["date"]; ?></td>
+						<td><?php echo $data["time_start"]; ?></td>
+						<td><?php echo $data["time_end"]; ?></td>
+						<td><?php echo $data["total_hours"]; ?></td>
+						<td><?php echo $data["task"]; ?></td>
+						<td><?php echo $data["work_area"]; ?></td>
+						<td><?php echo $data["extra_info"]; ?></td>
+					</tr>
+				<?php
+				}
+				?>
+				</tbody>
+			</table>
+		  <?php
+		  $html = ob_get_contents();
+		  ob_get_clean();
+		  $pdf->writeHTML($html, true, false, true, false, '');
+		  $pdf->Output('sammanfattning.pdf', 'D');
 	}
 }
