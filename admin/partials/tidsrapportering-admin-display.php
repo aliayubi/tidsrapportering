@@ -1,4 +1,3 @@
-
 <?php
     function tidsrapportering_save() {
         ob_start();
